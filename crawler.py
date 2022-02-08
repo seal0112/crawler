@@ -14,8 +14,8 @@ import os
 load_dotenv()
 
 option = webdriver.ChromeOptions()
-# option.add_argument('--headless')
-# option.add_argument('--disable-gpu')
+option.add_argument('--headless')
+option.add_argument('--disable-gpu')
 service_object = Service(ChromeDriverManager().install())
 
 driver = webdriver.Chrome(service=service_object, options=option)
