@@ -27,10 +27,11 @@ def getFutureDayDiff():
     driver.find_element(By.CLASS_NAME, 'btn').click()
     time.sleep(5)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    driver.close()
+    driver.quit()
     td = soup.find_all("tbody")[0].find_all("tr")[1].find_all("td")
+    difference = float(td[11].text.replace(',', '')) - float(td[12].text.replace(',', ''))
     message_object = {
-        'message': f'商品: {td[0].text.strip()}, 成交價: {td[6].text}, 漲跌: {td[7].text}, 震幅: {td[8].text}, 最高: {td[11].text}, 最低: {td[12].text}',
+            'message': f'商品: {td[0].text.strip()}, 成交價: {td[6].text}, 漲跌: {td[7].text}, 震幅: {td[8].text}, 點數差: {difference}, 最高: {td[11].text}, 最低: {td[12].text}',
         'webhook': os.environ.get("line-notify-stocker")
     }
     pushLineNotify(message_object)
