@@ -13,15 +13,27 @@ import os
 
 load_dotenv()
 
-option = webdriver.ChromeOptions()
-option.add_argument('--headless')
-option.add_argument('--disable-gpu')
-service_object = Service(ChromeDriverManager().install())
 
-driver = webdriver.Chrome(service=service_object, options=option)
+def getStockWeight():
+    index_count = 20
+    res = requests.get('https://www.taifex.com.tw/cht/2/weightedPropertion')
+    soup = BeautifulSoup(res.text, 'html.parser')
+    rows = soup.findChildren('table')[0].findChildren('tr')
+    notify_message = ''
+
+    for i in range(1, index_count+1):
+        element = rows[i].findChildren('td')
+        notify_message += f'\n{element[1].text.strip()} {element[2].text.strip()}     {element[3].text.strip()}'
+
+    message_object = {
+        'message': f'台股權值前{index_count}檔: {notify_message}',
+        'webhook': os.environ.get("line-notify-stocker")
+    }
+    pushLineNotify(message_object)
 
 
 def getFutureDayDiff():
+    driver = getChromeDriver()
     driver.get("https://mis.taifex.com.tw/futures/RegularSession/EquityIndices/FuturesDomestic/")
     time.sleep(2)
     driver.find_element(By.CLASS_NAME, 'btn').click()
@@ -35,6 +47,14 @@ def getFutureDayDiff():
         'webhook': os.environ.get("line-notify-stocker")
     }
     pushLineNotify(message_object)
+
+
+def getChromeDriver():
+    option = webdriver.ChromeOptions()
+    option.add_argument('--headless')
+    option.add_argument('--disable-gpu')
+    service_object = Service(ChromeDriverManager().install())
+    return webdriver.Chrome(service=service_object, options=option)
 
 
 def pushLineNotify(message_object):
@@ -51,5 +71,3 @@ def pushLineNotify(message_object):
 
     requests.post(notifyUrl, headers=headers, data=payload)
 
-
-getFutureDayDiff()
