@@ -121,7 +121,6 @@ def pushLineNotify(message_object):
     }
 
     res = requests.post(notifyUrl, headers=headers, data=payload)
-    print(res.text)
 
 
 if __name__ == '__main__':
