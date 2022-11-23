@@ -66,14 +66,14 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
     soup = BeautifulSoup(res.text, 'html.parser')
     rows = soup.findChildren('table')[0].findChildren('tr')
     current_date = f'{dateTime_in.year-1911}/{dateTime_in.month}/{dateTime_in.day}'
-    message = ""
+    messages = []
     for i in range(2, len(rows)):
         cells = rows[i].findChildren('td')
         if not cells:
             continue
         if re.match('^[0-9]{3}\/[0-9]{2}\/[0-9]{2}$', str(cells[2].text)):
             if cells[2].text == current_date:
-                message += f'{cells[0].text} {cells[1].text} {cells[2].text} {cells[4].text.strip()}\n'
+                messages.append(f'{cells[0].text} {cells[1].text} {cells[2].text} {cells[4].text.strip()}\n')
         else:
             date_range = cells[2].text.split(' 至 ')
             opening_day = date_range[0].split('/')
@@ -83,21 +83,24 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
             closing_day[0] = str(int(closing_day[0]) + 1911)
             closing_day = datetime.strptime('-'.join(closing_day), '%Y-%m-%d')+ timedelta(days=1)
             if opening_day < dateTime_in < closing_day:
-                message += f'{cells[0].text} {cells[1].text} {cells[2].text} {cells[4].text.strip()}\n'
+                messages.append(f'{cells[0].text} {cells[1].text} {cells[2].text} {cells[4].text.strip()}\n')
 
-    return message
+    return messages
 
 
 def getTodayCorporateBriefing():
     current_time = datetime.now()
-    message = f'{current_time.year-1911}/{current_time.month}/{current_time.day} 法說會公司\n'
     for exchange_type in ['sii', 'otc']:
-        message += crawlTodayCorporateBriefingSession(exchange_type, current_time)
-    message_object = {
-        'message': message,
-        'webhook': os.environ.get("line-notify-stocker")
-    }
-    pushLineNotify(message_object)
+        title = f'{current_time.year-1911}/{current_time.month}/{current_time.day} {exchange_type}法說會公司\n'
+        messages = crawlTodayCorporateBriefingSession(exchange_type, current_time)
+
+        for i in range(0, len(messages), 10):
+            message = title + "".join(messages[i:i+10])
+            message_object = {
+                'message': message,
+                'webhook': os.environ.get("line-notify-stocker")
+            }
+            pushLineNotify(message_object)
 
 
 def getChromeDriver():
