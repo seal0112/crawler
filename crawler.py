@@ -60,12 +60,12 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
         "firstin": 1,
         "TYPEK": exchange_type,
         "year": dateTime_in.year-1911,
-        "month": dateTime_in.month
+        "month": dateTime_in.strftime('%m')
     }
     res = requests.post(url, headers=headers, data=data)
     soup = BeautifulSoup(res.text, 'html.parser')
     rows = soup.findChildren('table')[0].findChildren('tr')
-    current_date = f'{dateTime_in.year-1911}/{dateTime_in.month}/{dateTime_in.day}'
+    current_date = f'{dateTime_in.year-1911}/{dateTime_in.month}/{dateTime_in.strftime("%d")}'
     messages = []
     for i in range(2, len(rows)):
         cells = rows[i].findChildren('td')
@@ -91,7 +91,7 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
 def getTodayCorporateBriefing():
     current_time = datetime.now()
     for exchange_type in ['sii', 'otc']:
-        title = f'{current_time.year-1911}/{current_time.month}/{current_time.day} {exchange_type}法說會公司\n'
+        title = f'{current_time.year-1911}/{current_time.month}/{current_time.strftime("%d")} {exchange_type}法說會公司\n'
         messages = crawlTodayCorporateBriefingSession(exchange_type, current_time)
 
         for i in range(0, len(messages), 10):
