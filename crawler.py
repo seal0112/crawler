@@ -65,7 +65,7 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
     res = requests.post(url, headers=headers, data=data)
     soup = BeautifulSoup(res.text, 'html.parser')
     rows = soup.findChildren('table')[0].findChildren('tr')
-    current_date = f'{dateTime_in.year-1911}/{dateTime_in.month}/{dateTime_in.strftime("%d")}'
+    current_date = f'{dateTime_in.year-1911}/{dateTime_in.strftime("%m")}/{dateTime_in.strftime("%d")}'
     messages = []
     for i in range(2, len(rows)):
         cells = rows[i].findChildren('td')
@@ -84,7 +84,6 @@ def crawlTodayCorporateBriefingSession(exchange_type, dateTime_in):
             closing_day = datetime.strptime('-'.join(closing_day), '%Y-%m-%d')+ timedelta(days=1)
             if opening_day < dateTime_in < closing_day:
                 messages.append(f'{cells[0].text} {cells[1].text} {cells[2].text} {cells[4].text.strip()}\n')
-
     return messages
 
 
