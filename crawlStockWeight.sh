@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/ec2-user/project/crawler
+cd $(dirname "$0")
 source venv/bin/activate
 python3 -c 'from crawler import getStockWeight; getStockWeight()'
 deactivate
