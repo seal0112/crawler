@@ -37,9 +37,9 @@ def getStockWeight():
 def getFutureDayDiff():
     driver = getChromeDriver()
     driver.get("https://mis.taifex.com.tw/futures/RegularSession/EquityIndices/FuturesDomestic/")
-    time.sleep(2)
+    time.sleep(3)
     driver.find_element(By.CLASS_NAME, 'btn').click()
-    time.sleep(5)
+    time.sleep(8)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     driver.quit()
     td = soup.find_all("tbody")[0].find_all("tr")[1].find_all("td")
